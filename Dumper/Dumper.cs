@@ -36,7 +36,7 @@ public class Dumper
         foreach (var column in table.Properties)
         {
             sc.Append(
-                $@"[{column.Name}] [{column.Type}] {(column.Nullable ? "NULL" : "NOT NULL")}{(column == table.Properties.Last() ? "" : $",{Environment.NewLine}")}");
+                $@"[{column.Name}] [{column.Type}] {(string.IsNullOrEmpty(column.Length) ? "" : $"({column.Length})")} {(column.Nullable ? "NULL" : "NOT NULL")} {(column.IsIdentity ? "IDENTITY(1, 1)" : "")}{(column == table.Properties.Last() ? "" : $",{Environment.NewLine}")}");
         }
 
         return sc.ToString();
