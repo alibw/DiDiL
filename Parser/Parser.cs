@@ -39,7 +39,6 @@ public static class Parser
         List<Column> columns = new List<Column>();
         var column = new Column();
         bool columnTokens = false;
-        bool notNullable = false;
         bool nameFilled = false;
         bool typeFilled = false;
         bool tableFilled = false;
@@ -70,15 +69,9 @@ public static class Parser
                     column.IsIdentity = true;
                 }
 
-                if (splitted[i].Contains("NOT"))
+                if (splitted[i] == "NULL" || splitted[i] == "NULL,")
                 {
-                    notNullable = true;
-                    column.Nullable = false;
-                }
-
-                if ((splitted[i] == "NULL" || splitted[i] == "NULL,") && !notNullable)
-                {
-                    column.Nullable = true;
+                    column.Nullable = splitted[i - 1] != "NOT";
                 }
 
                 if (((splitted[i-1].ToCharArray().Last() == ',' || splitted[i-1] == "(")) && !splitted[i].Contains(')'))
@@ -93,6 +86,11 @@ public static class Parser
                     column.Type = splitted[i];
                     typeFilled = true;
                     continue;
+                }
+
+                if (splitted[i].ToCharArray().First() == '(' && splitted[i].ToCharArray().Last() == ')')
+                {
+                    column.Length = splitted[i].Replace(")","").Replace("(","");
                 }
                 
                 if ((splitted[i].ToCharArray().Last() == ',' || splitted[i]== ")") && nameFilled && typeFilled)
